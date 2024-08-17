@@ -22,10 +22,8 @@ function CustomButton(props: CustomButtonProps) {
 
 export default function App() {
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <CustomButton onPress={() => alert('Button clicked!')}>
-        Click me
-      </CustomButton>
-    </div>
+    <CustomButton onPress={() => alert('Button clicked!')}>
+      Click me
+    </CustomButton>
   );
 }

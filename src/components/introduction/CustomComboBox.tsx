@@ -1,132 +1,98 @@
-import React, { MutableRefObject, RefObject, useState } from 'react';
-import { useComboBoxState } from 'react-stately';
-import { Node } from "@react-types/shared";
-import { DismissButton, Overlay, useComboBox, useListBox, useOption, useFilter, usePopover, useButton } from 'react-aria';
-import type {AriaButtonOptions, AriaComboBoxOptions, AriaListBoxOptions, AriaPopoverProps} from 'react-aria';
-import type {OverlayTriggerState, ComboBoxState} from 'react-stately';
+import {useButton, useComboBox, useFilter} from 'react-aria';
+import {Item, useComboBoxState} from 'react-stately';
 
+import {DismissButton, Overlay, usePopover} from 'react-aria';
+import type {AriaPopoverProps, AriaComboBoxProps, AriaListBoxOptions, AriaButtonProps} from 'react-aria';
+import type {OverlayTriggerState, ComboBoxState, Node} from 'react-stately';
+
+import {useListBox, useOption} from 'react-aria';
+import React, { RefObject } from 'react';
 
 type Item = {
   id: string;
   label: string;
 };
 
-const items: Item[] = [
-  { id: 'apple', label: 'Apple' },
-  { id: 'banana', label: 'Banana' },
-  { id: 'orange', label: 'Orange' },
-  { id: 'grape', label: 'Grape' },
-  { id: 'melon', label: 'Melon' },
-];
+function ComboBox(props: AriaComboBoxProps<Item>) {
 
-function ComboBox(props: AriaComboBoxOptions<Item>) {
   const { contains } = useFilter({ sensitivity: 'base' });
   const state = useComboBoxState({ ...props, defaultFilter: contains });
 
-  const { buttonProps, inputProps, listBoxProps, labelProps } = useComboBox(props, state);
+  const buttonRef = React.useRef(null);
+  const inputRef = React.useRef(null);
+  const listBoxRef = React.useRef(null);
+  const popoverRef = React.useRef(null);
+
+  const { buttonProps, inputProps, listBoxProps, labelProps } = useComboBox(
+    {
+      ...props,
+      inputRef,
+      buttonRef,
+      listBoxRef,
+      popoverRef
+    },
+    state
+  );
 
   return (
     <div className="relative inline-block w-64">
       <label {...labelProps} className="block text-sm font-medium text-gray-700">
         {props.label}
       </label>
-      <input
-        {...inputProps}
-        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-        ref={props.inputRef}
-      />
-      {props.buttonRef && <Button
-        {...buttonProps}
-        className="absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-        buttonRef={props.buttonRef}
-      >
-        <span
-          aria-hidden="true"
-          className="pb-0.5 pr-0.5"
+      <div className="relative">
+        <input
+          {...inputProps}
+          ref={inputRef}
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+        />
+        <Button
+          {...buttonProps}
+          buttonRef={buttonRef}
+          className="absolute inset-y-0 right-0 flex items-center content-center justify-center px-2 text-gray-700"
         >
-          ▼
-        </span>
-      </Button>}
-      {state.isOpen && (
-        <Popover
-          state={state}
-          triggerRef={props.inputRef}
-          popoverRef={props.popoverRef}
-          isNonModal
-          placement="bottom start"
-        >
-          <ListBox
-            {...listBoxProps}
+          <span
+            aria-hidden="true"
+          >
+            ▼
+          </span>
+        </Button>
+      </div>
+      {state.isOpen &&
+        (
+          <Popover
             state={state}
-            // className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto"
-            listBoxRef={props.listBoxRef}
-          />
-        </Popover>
-      )}
+            triggerRef={inputRef}
+            popoverRef={popoverRef}
+            isNonModal
+            placement="bottom start"
+          >
+            <ListBox
+              {...listBoxProps}
+              listBoxRef={listBoxRef}
+              state={state}
+              className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-gray-300 ring-opacity-5 overflow-auto"
+            />
+          </Popover>
+        )}
     </div>
   );
 }
 
-function ListBox({ state, className, ...props }: AriaListBoxOptions<Item> & { className?: string, state: ComboBoxState<Item>, listBoxRef: RefObject<HTMLElement | null> }) {
-  const { listBoxRef } = props;
-  const { listBoxProps } = useListBox(props, state, props.listBoxRef);
-  return (
-    <ul
-      {...listBoxProps}
-      ref={listBoxRef as React.MutableRefObject<HTMLUListElement>}
-      className={`${className} list-none p-0 m-0`}
-    >
-      {[...state.collection].map((item) => (
-        <Option key={item.key} item={item} state={state} />
-      ))}
-    </ul>
-  );
+interface PopoverProps extends AriaPopoverProps {
+  children: React.ReactNode;
+  state: OverlayTriggerState;
 }
 
-function Option({ item, state }: { item: Node<Item>, state: ComboBoxState<Item> }) {
-  const ref = React.useRef(null);
-  const { optionProps, isSelected, isFocused } = useOption(
-    { key: item.key },
-    state,
-    ref
-  );
+function Popover({ children, state, ...props }: PopoverProps) {
+  const { popoverProps } = usePopover(props, state);
 
-  return (
-    <li
-      {...optionProps}
-      ref={ref}
-      className={`cursor-default select-none relative py-2 pl-3 pr-9 ${
-        isFocused ? 'text-white bg-indigo-600' : 'text-gray-900'
-      } ${isSelected ? 'font-semibold' : 'font-normal'}`}
-    >
-      {item.rendered}
-    </li>
-  );
-}
-
-function Popover({ children, state, offset = 8, ...props }: AriaPopoverProps & { children: React.ReactNode;
-  state: OverlayTriggerState;} ) {
-  const { popoverProps, underlayProps, arrowProps, placement } = usePopover({
-    ...props,
-    offset,
-  }, state);
   return (
     <Overlay>
-      <div {...underlayProps} className="underlay" />
       <div
         {...popoverProps}
-        ref={props.popoverRef as React.MutableRefObject<HTMLDivElement>}
-        className="popover"
+        ref={props.popoverRef as React.RefObject<HTMLDivElement>}
+        className="bg-gray-300 border border-gray-500 rounded-md shadow-lg"
       >
-        <svg
-          {...arrowProps}
-          className="arrow"
-          data-placement={placement}
-          viewBox="0 0 12 12"
-        >
-          <path d="M0 0 L6 6 L12 0" />
-        </svg>
-        <DismissButton onDismiss={state.close} />
         {children}
         <DismissButton onDismiss={state.close} />
       </div>
@@ -134,39 +100,66 @@ function Popover({ children, state, offset = 8, ...props }: AriaPopoverProps & {
   );
 }
 
-function Button(props: AriaButtonOptions<"button"> & { className: string, children: React.ReactNode, buttonRef: RefObject<Element | null> }) {
-  const { buttonProps } = useButton(props, props.buttonRef);
-  const { children } = props;
+function ListBox(props: AriaListBoxOptions<Item> & { className?: string, state: ComboBoxState<Item>, listBoxRef: RefObject<HTMLUListElement> }) {
+  const ref = React.useRef(null);
+  const { listBoxRef = ref, state } = props;
+  const { listBoxProps } = useListBox(props, state, listBoxRef);
+
   return (
-    <button {...buttonProps} ref={props.buttonRef as MutableRefObject<HTMLButtonElement>}>
-      {children}
+    <ul
+      {...listBoxProps}
+      ref={listBoxRef}
+      className={`${props.className} list-none p-0 m-0 max-h-40 overflow-auto min-w-52`}
+    >
+      {[...state.collection].map((item) => (
+        <Option
+          key={item.key}
+          item={item}
+          state={state}
+        />
+      ))}
+    </ul>
+  );
+}
+
+function Option({ item, state }: { item: Node<Item>, state: ComboBoxState<Item> }) {
+  const ref = React.useRef(null);
+  const { optionProps, isSelected, isFocused, isDisabled } = useOption(
+    { key: item.key },
+    state,
+    ref
+  );
+  return (
+    <li
+      {...optionProps}
+      ref={ref}
+      className={`cursor-default select-none relative py-2 pl-3 pr-9 ${
+        isFocused ? 'text-white bg-indigo-600' : 'text-gray-900'
+      } ${isSelected ? 'font-semibold' : 'font-normal'} ${isDisabled ? 'opacity-50' : ''}`}
+    >
+      {item.rendered}
+    </li>
+  );
+}
+
+function Button(props: AriaButtonProps<"button"> & { className?: string, children: React.ReactNode, buttonRef: RefObject<HTMLButtonElement>, style?: React.CSSProperties }) {
+  const ref = props.buttonRef;
+  const { buttonProps } = useButton(props, ref);
+  return (
+    <button {...buttonProps} ref={ref} className={props.className}>
+      {props.children}
     </button>
   );
 }
 
 export default function App() {
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-  const inputRef = React.useRef<HTMLInputElement | null>(null);
-  const popoverRef = React.useRef<HTMLDivElement | null>(null);
-  const listBoxRef = React.useRef<HTMLUListElement | null>(null);
-  const buttonRef = React.useRef<HTMLButtonElement | null>(null);
   return (
-    <div className="p-8">
-      <ComboBox
-        label="Choose a fruit"
-        items={items}
-        onSelectionChange={(key) => setSelectedItem(items.find((item) => item.id === key) || null)}
-        selectedKey={selectedItem ? selectedItem.id : null}
-        inputRef={inputRef}
-        popoverRef={popoverRef}
-        listBoxRef={listBoxRef}
-        buttonRef={buttonRef}
-      />
-      {selectedItem && (
-        <p className="mt-4 text-gray-700">
-          Selected fruit: <strong>{selectedItem.label}</strong>
-        </p>
-      )}
-    </div>
+    <ComboBox label="Choose a fruit">
+      <Item key="apple">Apple</Item>
+      <Item key="banana">Banana</Item>
+      <Item key="orange">Orange</Item>
+      <Item key="grape">Grape</Item>
+      <Item key="melon">Melon</Item>
+    </ComboBox>
   );
 }

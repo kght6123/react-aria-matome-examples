@@ -2,14 +2,16 @@ import './App.css'
 
 import CustomButton from './components/introduction/CustomButton'
 import CustomComboBox from './components/introduction/CustomComboBox'
-import CustomComboBox2 from './components/introduction/CustomComboBox2'
 
 function App() {
   return (
     <>
-      <CustomButton />
-      <CustomComboBox />
-      <CustomComboBox2 />
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <CustomButton />
+      </div>
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <CustomComboBox />
+      </div>
     </>
   )
 }
