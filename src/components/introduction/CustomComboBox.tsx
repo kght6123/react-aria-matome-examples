@@ -1,12 +1,17 @@
-import {useButton, useComboBox, useFilter} from 'react-aria';
-import {Item, useComboBoxState} from 'react-stately';
+import { useButton, useComboBox, useFilter } from "react-aria";
+import { Item, useComboBoxState } from "react-stately";
 
-import {DismissButton, Overlay, usePopover} from 'react-aria';
-import type {AriaPopoverProps, AriaComboBoxProps, AriaListBoxOptions, AriaButtonProps} from 'react-aria';
-import type {OverlayTriggerState, ComboBoxState, Node} from 'react-stately';
+import { DismissButton, Overlay, usePopover } from "react-aria";
+import type {
+  AriaPopoverProps,
+  AriaComboBoxProps,
+  AriaListBoxOptions,
+  AriaButtonProps,
+} from "react-aria";
+import type { OverlayTriggerState, ComboBoxState, Node } from "react-stately";
 
-import {useListBox, useOption} from 'react-aria';
-import React, { RefObject } from 'react';
+import { useListBox, useOption } from "react-aria";
+import React, { RefObject } from "react";
 
 type Item = {
   id: string;
@@ -14,8 +19,7 @@ type Item = {
 };
 
 function ComboBox(props: AriaComboBoxProps<Item>) {
-
-  const { contains } = useFilter({ sensitivity: 'base' });
+  const { contains } = useFilter({ sensitivity: "base" });
   const state = useComboBoxState({ ...props, defaultFilter: contains });
 
   const buttonRef = React.useRef(null);
@@ -29,14 +33,17 @@ function ComboBox(props: AriaComboBoxProps<Item>) {
       inputRef,
       buttonRef,
       listBoxRef,
-      popoverRef
+      popoverRef,
     },
-    state
+    state,
   );
 
   return (
     <div className="relative inline-block w-64">
-      <label {...labelProps} className="block text-sm font-medium text-gray-700">
+      <label
+        {...labelProps}
+        className="block text-sm font-medium text-gray-700"
+      >
         {props.label}
       </label>
       <div className="relative">
@@ -50,30 +57,25 @@ function ComboBox(props: AriaComboBoxProps<Item>) {
           buttonRef={buttonRef}
           className="absolute inset-y-0 right-0 flex items-center content-center justify-center px-2 text-gray-700"
         >
-          <span
-            aria-hidden="true"
-          >
-            ▼
-          </span>
+          <span aria-hidden="true">▼</span>
         </Button>
       </div>
-      {state.isOpen &&
-        (
-          <Popover
+      {state.isOpen && (
+        <Popover
+          state={state}
+          triggerRef={inputRef}
+          popoverRef={popoverRef}
+          isNonModal
+          placement="bottom start"
+        >
+          <ListBox
+            {...listBoxProps}
+            listBoxRef={listBoxRef}
             state={state}
-            triggerRef={inputRef}
-            popoverRef={popoverRef}
-            isNonModal
-            placement="bottom start"
-          >
-            <ListBox
-              {...listBoxProps}
-              listBoxRef={listBoxRef}
-              state={state}
-              className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-gray-300 ring-opacity-5 overflow-auto"
-            />
-          </Popover>
-        )}
+            className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-gray-300 ring-opacity-5 overflow-auto"
+          />
+        </Popover>
+      )}
     </div>
   );
 }
@@ -100,7 +102,13 @@ function Popover({ children, state, ...props }: PopoverProps) {
   );
 }
 
-function ListBox(props: AriaListBoxOptions<Item> & { className?: string, state: ComboBoxState<Item>, listBoxRef: RefObject<HTMLUListElement> }) {
+function ListBox(
+  props: AriaListBoxOptions<Item> & {
+    className?: string;
+    state: ComboBoxState<Item>;
+    listBoxRef: RefObject<HTMLUListElement>;
+  },
+) {
   const ref = React.useRef(null);
   const { listBoxRef = ref, state } = props;
   const { listBoxProps } = useListBox(props, state, listBoxRef);
@@ -112,37 +120,46 @@ function ListBox(props: AriaListBoxOptions<Item> & { className?: string, state: 
       className={`${props.className} list-none p-0 m-0 max-h-40 overflow-auto min-w-52`}
     >
       {[...state.collection].map((item) => (
-        <Option
-          key={item.key}
-          item={item}
-          state={state}
-        />
+        <Option key={item.key} item={item} state={state} />
       ))}
     </ul>
   );
 }
 
-function Option({ item, state }: { item: Node<Item>, state: ComboBoxState<Item> }) {
+function Option({
+  item,
+  state,
+}: {
+  item: Node<Item>;
+  state: ComboBoxState<Item>;
+}) {
   const ref = React.useRef(null);
   const { optionProps, isSelected, isFocused, isDisabled } = useOption(
     { key: item.key },
     state,
-    ref
+    ref,
   );
   return (
     <li
       {...optionProps}
       ref={ref}
       className={`cursor-default select-none relative py-2 pl-3 pr-9 ${
-        isFocused ? 'text-white bg-indigo-600' : 'text-gray-900'
-      } ${isSelected ? 'font-semibold' : 'font-normal'} ${isDisabled ? 'opacity-50' : ''}`}
+        isFocused ? "text-white bg-indigo-600" : "text-gray-900"
+      } ${isSelected ? "font-semibold" : "font-normal"} ${isDisabled ? "opacity-50" : ""}`}
     >
       {item.rendered}
     </li>
   );
 }
 
-function Button(props: AriaButtonProps<"button"> & { className?: string, children: React.ReactNode, buttonRef: RefObject<HTMLButtonElement>, style?: React.CSSProperties }) {
+function Button(
+  props: AriaButtonProps<"button"> & {
+    className?: string;
+    children: React.ReactNode;
+    buttonRef: RefObject<HTMLButtonElement>;
+    style?: React.CSSProperties;
+  },
+) {
   const ref = props.buttonRef;
   const { buttonProps } = useButton(props, ref);
   return (

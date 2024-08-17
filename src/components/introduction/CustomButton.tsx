@@ -1,7 +1,7 @@
-import React, { RefObject } from 'react';
-import { AriaButtonProps, useButton } from 'react-aria';
+import React, { RefObject } from "react";
+import { AriaButtonProps, useButton } from "react-aria";
 
-type CustomButtonProps = AriaButtonProps<'button'> & {
+type CustomButtonProps = AriaButtonProps<"button"> & {
   children: React.ReactNode;
 };
 
@@ -22,7 +22,7 @@ function CustomButton(props: CustomButtonProps) {
 
 export default function App() {
   return (
-    <CustomButton onPress={() => alert('Button clicked!')}>
+    <CustomButton onPress={() => alert("Button clicked!")}>
       Click me
     </CustomButton>
   );

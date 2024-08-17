@@ -1,7 +1,7 @@
-import './App.css'
+import "./App.css";
 
-import CustomButton from './components/introduction/CustomButton'
-import CustomComboBox from './components/introduction/CustomComboBox'
+import CustomButton from "./components/introduction/CustomButton";
+import CustomComboBox from "./components/introduction/CustomComboBox";
 
 function App() {
   return (
@@ -13,7 +13,7 @@ function App() {
         <CustomComboBox />
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
