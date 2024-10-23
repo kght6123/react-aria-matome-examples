@@ -1,7 +1,7 @@
-import { addons } from '@storybook/manager-api';
+import { addons } from "@storybook/manager-api";
 
 import CustomTheme from "./dadsTheme";
 
 addons.setConfig({
-  theme: CustomTheme,
+	theme: CustomTheme,
 });
