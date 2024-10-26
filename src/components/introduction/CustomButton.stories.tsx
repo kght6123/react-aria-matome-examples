@@ -2,16 +2,16 @@ import React from "react";
 import { CustomButton } from "./CustomButton";
 
 export default {
-	component: CustomButton,
-	title: "第1章 React Ariaの紹介/CustomButton",
+  component: CustomButton,
+  title: "第1章 React Ariaの紹介/CustomButton",
 };
 
 const Template = (args) => <CustomButton {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-	onPress: () => alert("Button clicked!"),
-	children: "Click me",
+  onPress: () => alert("Button clicked!"),
+  children: "Click me",
 };
 
 // export const Pinned = Template.bind({});
