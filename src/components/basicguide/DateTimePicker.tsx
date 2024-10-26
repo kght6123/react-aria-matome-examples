@@ -29,22 +29,30 @@ export default function DateTimePicker() {
 				className="mb-4"
 			>
 				<Label>Date</Label>
-				<Group>
-					<DateInput>
-						{(segment) => <DateSegment segment={segment} />}
+				<Group className="flex w-fit items-center justify-center content-center gap-4">
+					<DateInput className="flex gap-1">
+						{(segment) => (
+							<DateSegment segment={segment} className="px-2 py-1" />
+						)}
 					</DateInput>
-					<Button>▼</Button>
+					<Button className="bg-violet-600 text-white rounded w-8 h-8 p-0 text-sm box-content focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:outline-offset-2">
+						▼
+					</Button>
 				</Group>
-				<Popover>
-					<Dialog>
+				<Popover className="max-w-none">
+					<Dialog className="p-4 bg-white shadow-lg rounded">
 						<Calendar>
-							<header>
-								<Button slot="previous">◀</Button>
+							<header className="flex gap-4 items-center justify-center bg-violet-100">
+								<Button slot="previous" className="p-2">
+									◀
+								</Button>
 								<Heading />
-								<Button slot="next">▶</Button>
+								<Button slot="next" className="p-2">
+									▶
+								</Button>
 							</header>
 							<CalendarGrid>
-								{(date) => <CalendarCell date={date} />}
+								{(date) => <CalendarCell date={date} className="p-2" />}
 							</CalendarGrid>
 						</Calendar>
 					</Dialog>
@@ -55,7 +63,9 @@ export default function DateTimePicker() {
 				onChange={(value) => setSelectedTime(value)}
 			>
 				<Label>Event time</Label>
-				<DateInput>{(segment) => <DateSegment segment={segment} />}</DateInput>
+				<DateInput className="flex gap-1">
+					{(segment) => <DateSegment segment={segment} className="px-2 py-1" />}
+				</DateInput>
 			</TimeField>
 		</>
 	);
